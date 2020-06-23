@@ -1,12 +1,14 @@
-import React, {useState, useContext} from 'react';
+import React, { useContext, useState } from 'react';
 import { Form, Item, Text, Button, Input } from 'native-base';
 import { TodosContext } from './App'
+import axios from 'axios';
 
 export default function ToDoDetail({route, navigation}) {    
     const { text } = route.params;
 
     const [todoText, setTodoText] = useState(text)        
     const {state, dispatch} = useContext(TodosContext); 
+    const endpoint = "http://localhost:3000/todos/"
   
     return (
       <Form>
@@ -16,10 +18,9 @@ export default function ToDoDetail({route, navigation}) {
               value={todoText} 
             />                
         </Item>
-        <Button onPress={() =>{
-            dispatch({
-              type: 'edit', payload:{...route.params,text:todoText}
-            });
+        <Button onPress={async () =>{
+            await axios.patch(endpoint+route.params.id,{text:todoText})         
+            dispatch({type: 'edit', payload:{...route.params,text:todoText}});
             navigation.navigate('ToDoList');
         }}>
             <Text>Edit</Text>
