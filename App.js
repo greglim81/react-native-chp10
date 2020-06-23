@@ -7,10 +7,7 @@ import ToDoDetail from './ToDoDetail';
 
 
 const todosInitialState = { 
-  todos:[{ id:1, text: "finishing writing hooks chapter"},
-    { id:2, text: "play with kids"},
-    { id:3, text: "read bible"}
-  ]
+  todos:[]
 };
 
 export const TodosContext = React.createContext()
@@ -35,6 +32,8 @@ export default function App (){
 
 function todosReducer(state, action){ 
   switch(action.type){ 
+    case 'get':     
+      return {...state,todos:action.payload}    
     case 'add':
       // add new todo onto array
       const addedToDos = [...state.todos,action.payload]
