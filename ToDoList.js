@@ -1,26 +1,37 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { TodosContext } from './App'
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Text, Container, Header, Item, Input, Button } from 'native-base';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import uuid from 'uuid-random';
+import useAPI from './useAPI';
+import axios from 'axios'; //npm install axios
 
 export default function ToDoList({navigation}) {
     const {state, dispatch} = useContext(TodosContext); 
     const [todoText, setTodoText] = useState("")    
     const buttonTitle = "Add";
 
-    const handleSubmit = () =>{
+    const handleSubmit = async () =>{                
         const newToDo = {id: uuid(), text: todoText};
+        const response = await axios.post(endpoint,newToDo)
         dispatch({type: 'add', payload: newToDo});
-        setTodoText('');        
+        setTodoText('');
     }
-
+    
     const renderItem = data => (
         <View style={styles.rowFront}>
             <Text>{data.item.text}</Text>
         </View>
     );
+
+    const endpoint = "http://localhost:3000/todos/"
+    const savedTodos = useAPI(endpoint)
+
+    useEffect(()=>{
+        dispatch({type: "get", payload: savedTodos})
+      },[savedTodos]) // dispatch whenever savedTodos changes
+
 
     const renderHiddenItem = (data, rowMap) => (
         <View style={styles.rowBack}>
@@ -36,9 +47,11 @@ export default function ToDoList({navigation}) {
         </View>
     );
 
-    const deleteRow = (todo) => {
+    const deleteRow = async (todo) => {        
+        await axios.delete(endpoint + todo.id);
         dispatch({type:'delete',payload:todo});
     };
+
 
     const editRow = (todo,rowMap) => {        
         if (rowMap[todo.id]) {
